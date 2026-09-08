@@ -1,0 +1,1 @@
+This module periodically checks the connection status of incoming and outgoing mail servers to detect failures early. It displays prominent notifications to administrators whenever a mail server configuration stops working.
