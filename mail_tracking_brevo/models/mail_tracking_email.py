@@ -59,7 +59,7 @@ EQUIVALENTS = {
 class MailTrackingEmail(models.Model):
     _inherit = "mail.tracking.email"
 
-    def _country_search(self, country_code):
+    def _brevo_country_search(self, country_code):
         country = False
         if country_code:
             country = self.env["res.country"].search(
@@ -137,7 +137,9 @@ class MailTrackingEmail(models.Model):
         metadata.update(
             {
                 "mobile": event.get("device_type") in {"mobile", "tablet"},
-                "user_country_id": self._country_search(event.get("country", False)),
+                "user_country_id": self._brevo_country_search(
+                    event.get("country", False)
+                ),
             }
         )
         if brevo_event_type in (
@@ -245,6 +247,7 @@ class MailTrackingEmail(models.Model):
             "delivered": 30,
             "opened": 40,
             "unsub": 40,
+            "click": 50,
             "soft-bounced": 50,
             "bounced": 50,
             "spam": 50,

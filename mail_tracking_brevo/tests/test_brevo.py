@@ -149,13 +149,13 @@ class TestBrevoTracking(HttpCase):
     @patch("requests.put")
     def test_06_partner_brevo_actions(self, mock_put, mock_get):
         """Test partner bounce checking, setting, and unsetting."""
-        # Test check_email_bounced
+        # Test brevo_check_email_bounced
         mock_get_res = MagicMock()
         mock_get_res.status_code = 200
         mock_get_res.json.return_value = {"emailBlacklisted": True}
         mock_get.return_value = mock_get_res
 
-        self.partner.check_email_bounced()
+        self.partner.brevo_check_email_bounced()
         self.partner.invalidate_recordset()
         self.assertTrue(self.partner.email_bounced)
 
