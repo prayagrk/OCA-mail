@@ -17,10 +17,10 @@ class ResPartner(models.Model):
 
     def email_bounced_set(self, tracking_emails, reason, event=None):
         res = super().email_bounced_set(tracking_emails, reason, event=event)
-        self._email_bounced_set(reason, event)
+        self._brevo_email_bounced_set(reason, event)
         return res
 
-    def _email_bounced_set(self, reason, event):
+    def _brevo_email_bounced_set(self, reason, event):
         for partner in self:
             if not partner.email:
                 continue
@@ -41,7 +41,7 @@ class ResPartner(models.Model):
                 partner = partner.with_user(SUPERUSER_ID)
             partner.message_post(body=body)
 
-    def check_email_bounced(self):
+    def brevo_check_email_bounced(self):
         """Checks if the partner's email is blacklisted in Brevo.
         API documentation:
         https://developers.brevo.com/reference/getcontactinfo

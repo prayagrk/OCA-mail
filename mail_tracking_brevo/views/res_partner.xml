@@ -6,10 +6,14 @@
         <field name="inherit_id" ref="mail_tracking.view_partner_form" />
         <field name="arch" type="xml">
             <field name="email_bounced" position="after">
-                <label for="check_email_bounced" string="Brevo" invisible="not email" />
+                <label
+                    for="brevo_check_email_bounced"
+                    string="Brevo"
+                    invisible="not email"
+                />
                 <div name="brevo_buttons" invisible="not email">
                     <button
-                        name="check_email_bounced"
+                        name="brevo_check_email_bounced"
                         type="object"
                         string="Check Brevo"
                         class="oe_link"

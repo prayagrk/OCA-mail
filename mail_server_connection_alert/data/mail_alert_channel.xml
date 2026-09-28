@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record
+        model="discuss.channel"
+        id="mail_server_connection_alert.channel_alert_admin"
+    >
+        <field name="name">System Mail Alerts</field>
+        <field name="description">Channel for mail server failure alert.</field>
+        <field name="channel_type">group</field>
+        <field name="group_ids" eval="[Command.link(ref('base.group_system'))]" />
+    </record>
+</odoo>

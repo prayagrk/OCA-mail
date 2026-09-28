@@ -3,9 +3,10 @@
 
 import logging
 
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import NotAcceptable
 
 from odoo import http
+from odoo.exceptions import ValidationError
 from odoo.http import request
 
 from odoo.addons.mail_tracking.controllers import main
@@ -15,6 +16,15 @@ _logger = logging.getLogger(__name__)
 
 
 class MailTrackingController(main.MailTrackingController):
+    def _mail_tracking_brevo_webhook_verify(self, expected_token, kwargs):
+        """Avoid brevo webhook attacks."""
+        if not expected_token:
+            return
+        token = request.params.get("token") or kwargs.get("token")
+        if token != expected_token:
+            _logger.warning("Brevo webhook rejected: invalid token")
+            raise ValidationError(request.env._("Invalid webhook token"))
+
     @http.route(
         ["/mail/tracking/brevo/all"],
         auth="none",
@@ -23,15 +33,18 @@ class MailTrackingController(main.MailTrackingController):
         methods=["POST", "GET"],
     )
     def mail_tracking_brevo_webhook(self, **kwargs):
-        """Process webhooks from Brevo."""
+        """Process webhooks from Brevo.
+        See https://app.brevo.com/app-store/webhooks,
+        https://help.brevo.com/hc/en-us/articles/27824932835474-Create-outbound-webhooks-to-send-real-time-data-from-Brevo-to-an-external-app
+        """  # noqa: E501
         ensure_db()
         icp = request.env["ir.config_parameter"].sudo()
-        expected_token = icp.get_param("brevo.webhook_token")
-        if expected_token:
-            token = request.params.get("token") or kwargs.get("token")
-            if token != expected_token:
-                _logger.warning("Brevo webhook rejected: invalid token")
-                raise Forbidden("Invalid webhook token")
+        try:
+            self._mail_tracking_brevo_webhook_verify(
+                icp.get_param("brevo.webhook_token"), kwargs
+            )
+        except ValidationError as error:
+            raise NotAcceptable from error
 
         try:
             event_data = request.get_json_data() or {}
