@@ -437,11 +437,11 @@ class TestMailgun(BaseCommon):
     def test_bounced(self, mock_request):
         self.partner.email_bounced = True
         mock_request.get.return_value.status_code = 404
-        self.partner.check_email_bounced()
+        self.partner.brevo_check_email_bounced()
         self.assertFalse(self.partner.email_bounced)
         mock_request.get.return_value.status_code = 200
         self.partner.force_set_bounced()
-        self.partner.check_email_bounced()
+        self.partner.brevo_check_email_bounced()
         self.assertTrue(self.partner.email_bounced)
         mock_request.delete.return_value.status_code = 200
         self.partner.force_unset_bounced()
